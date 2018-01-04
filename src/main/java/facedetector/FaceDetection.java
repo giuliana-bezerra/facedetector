@@ -2,10 +2,15 @@ package facedetector;
 
 import static org.bytedeco.javacpp.helper.opencv_objdetect.cvHaarDetectObjects;
 import static org.bytedeco.javacpp.opencv_core.cvClearMemStorage;
+import static org.bytedeco.javacpp.opencv_core.cvCopy;
+import static org.bytedeco.javacpp.opencv_core.cvCreateImage;
 import static org.bytedeco.javacpp.opencv_core.cvGetSeqElem;
+import static org.bytedeco.javacpp.opencv_core.cvGetSize;
 import static org.bytedeco.javacpp.opencv_core.cvLoad;
 import static org.bytedeco.javacpp.opencv_core.cvPoint;
+import static org.bytedeco.javacpp.opencv_core.cvSetImageROI;
 import static org.bytedeco.javacpp.opencv_imgcodecs.cvLoadImage;
+import static org.bytedeco.javacpp.opencv_imgcodecs.cvSaveImage;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_AA;
 import static org.bytedeco.javacpp.opencv_imgproc.cvRectangle;
 import static org.bytedeco.javacpp.opencv_objdetect.CV_HAAR_DO_CANNY_PRUNING;
@@ -46,7 +51,16 @@ public class FaceDetection {
 		System.out.print(totalFaces); // How many faces were found? It will be
 										// considered the first one.
 		drawRectangule(src, faces);
+		cropFaceImage(src, faces);
 		showImage(src);
+	}
+
+	private static void cropFaceImage(IplImage src, CvSeq faces) {
+		CvRect rectangule = new CvRect(cvGetSeqElem(faces, 0));
+		cvSetImageROI(src, rectangule);
+		IplImage faceImage = cvCreateImage(cvGetSize(src), src.depth(), src.nChannels());
+		cvCopy(src, faceImage);
+		cvSaveImage("face.png", faceImage);
 	}
 
 	private static void drawRectangule(IplImage src, CvSeq faces) {
